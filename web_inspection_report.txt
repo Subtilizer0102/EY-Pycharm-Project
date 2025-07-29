@@ -1,0 +1,50 @@
+Webpage Inspection Report
+==============================
+
+URL: https://www.saucedemo.com
+
+AI Analysis:
+Here are the elements found on the [Sauce Demo](https://www.saucedemo.com) homepage:
+
+### Buttons:
+1. **Login Button**  
+   - **ID**: `login-button`  
+   - **CSS Selector**: `input.submit-button.btn_action[name='login-button'][type='submit'][value='Login']`  
+   - **XPath**: `//input[@name='login-button' and @type='submit' and @value='Login']`
+
+### Input Boxes:
+1. **Username Input**  
+   - **ID**: `user-name`  
+   - **CSS Selector**: `input.input_error.form_input[name='user-name'][type='text'][placeholder='Username']`  
+   - **XPath**: `//input[@name='user-name' and @type='text' and @placeholder='Username']`
+
+2. **Password Input**  
+   - **ID**: `password`  
+   - **CSS Selector**: `input.input_error.form_input[name='password'][type='password'][placeholder='Password']`  
+   - **XPath**: `//input[@name='password' and @type='password' and @placeholder='Password']`
+
+No hyperlinks were detected on the page. Let me know if you'd like further analysis or interactions with these elements!
+
+Raw Data:
+{
+  "buttons": [
+    {
+      "id": "login-button",
+      "css_selector": "input.submit-button.btn_action[name='login-button'][type='submit'][value='Login']",
+      "xpath": "//input[@name='login-button' and @type='submit' and @value='Login']"
+    }
+  ],
+  "input_boxes": [
+    {
+      "id": "user-name",
+      "css_selector": "input.input_error.form_input[name='user-name'][type='text'][placeholder='Username']",
+      "xpath": "//input[@name='user-name' and @type='text' and @placeholder='Username']"
+    },
+    {
+      "id": "password",
+      "css_selector": "input.input_error.form_input[name='password'][type='password'][placeholder='Password']",
+      "xpath": "//input[@name='password' and @type='password' and @placeholder='Password']"
+    }
+  ],
+  "hyperlinks": []
+}
