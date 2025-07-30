@@ -1,48 +1,27 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
 
-driver = webdriver.Chrome()
+# Initialize the driver
+driver = webdriver.Chrome(service=Service())
 driver.get("https://www.saucedemo.com")
 
-try:
-    username = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "user-name")))
-    username.send_keys("standard_user")
-    password = driver.find_element(By.ID, "password")
-    password.send_keys("secret_sauce")
-    login_button = driver.find_element(By.ID, "login-button")
-    login_button.click()
+# Wait for the page to load and elements to be present
+WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "user-name")))
 
-    inventory_container = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "inventory_container")))
-    add_to_cart_button = driver.find_element(By.ID, "add-to-cart-sauce-labs-backpack")
-    add_to_cart_button.click()
+# Fill in username and password
+driver.find_element(By.ID, "user-name").send_keys("test_user")
+driver.find_element(By.ID, "password").send_keys("test_password")
 
-    cart_badge = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "shopping_cart_badge")))
-    cart_icon = driver.find_element(By.CLASS_NAME, "shopping_cart_link")
-    cart_icon.click()
+# Click the login button
+driver.find_element(By.ID, "login-button").click()
 
-    checkout_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "checkout")))
-    checkout_button.click()
+# Wait for the next page to load or perform further actions
+WebDriverWait(driver, 10).until(EC.url_to_be("https://www.saucedemo.com/inventory.html"))
 
-    checkout_form = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "checkout_info_container")))
-    first_name = driver.find_element(By.ID, "first-name")
-    first_name.send_keys("John")
-    last_name = driver.find_element(By.ID, "last-name")
-    last_name.send_keys("Doe")
-    postal_code = driver.find_element(By.ID, "postal-code")
-    postal_code.send_keys("12345")
-    continue_button = driver.find_element(By.ID, "continue")
-    continue_button.click()
-
-    finish_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "finish")))
-    finish_button.click()
-
-    time.sleep(2)
-    time.sleep(5)
-except Exception as e:
-    print(f"An error occurred: {e}")
-finally:
-    driver.quit()
+time.sleep(5)
+driver.quit()

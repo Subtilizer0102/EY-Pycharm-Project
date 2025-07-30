@@ -202,7 +202,23 @@ tools = [
                                         "from selenium.webdriver.support import expected_conditions as EC\n"
                                         "Only include the python code in response with no comments."
                                         "Remember to remove 'python' at top of the script - very important so that the script can be run as a subprocess."
-                                        "run the script after generating the code."}]"""
+                                        "run the python script after generating the code. Use all the run script tool and inspect tool."}]"""
+
+message = [{"role": "user", "content": "Inspect the elements on Sauce Demo: https://www.amazon.in"
+                                        "Register as a new user on the website by filling in a random username and password."
+                                        "Use chromedriver as the browser. Search html elements by ID.\n"
+                                        "Add explicit waits after each page navigation using WebDriverWait and expected_conditions.\n"
+                                        "Handle potential errors with try/except blocks.\n"
+                                        "Sleep for 2 seconds only at the very end.\n"
+                                        "Sleep for 5 seconds after finishing all the actions.\n"
+                                        "Imports: from selenium import webdriver, from selenium.webdriver.chrome.service import Service, "
+                                        "from selenium.webdriver.common.by import By, from selenium.webdriver.common.keys import Keys, import time\n"
+                                        "from selenium.webdriver.support.ui import WebDriverWait\n"
+                                        "from selenium.webdriver.support import expected_conditions as EC\n"
+                                        "Only include the python code in response with no comments."
+                                        "Remember to remove 'python' at top of the script - very important so that the script can be run as a subprocess."
+                                        "run the python script after generating the code. Use all the run script tool and inspect tool."}]
+
 
 system_prompt = """"You are test automation engineer. Use tools - inspect tool, run script to perform actions."
                     "Write selenium code to test actions performed on a website (given by user as input)"
@@ -228,15 +244,20 @@ system_prompt = """"You are test automation engineer. Use tools - inspect tool, 
 user_prompt = """Inspect the elements on amazon: https://www.amazon.in. Then register on the website with a new account. 
                  Fill in a valid username and password to create this new account."""
 
-messages = [
+"""messages = [
     SystemMessage(content=system_prompt),
     HumanMessage(content=user_prompt)
+]"""
+
+message = [
+    {"role": "system", "content": system_prompt},
+    {"role": "user", "content": user_prompt}
 ]
 
 # First API call - detect function need
 completion = model.chat.completions.create(
     model="deepseek/deepseek-chat-v3-0324:free",
-    messages=messages,
+    messages=message,
     tools=tools,
     tool_choice="auto",
 )
@@ -244,15 +265,31 @@ print(completion)
 
 # Process tool calls in a loop
 while True:
-    message = completion.choices[0].message
-    print(message)
-    tool_calls = message.tool_calls if message.tool_calls else []
+    assistant_message = completion.choices[0].message
+    print(assistant_message)
+    tool_calls = assistant_message.tool_calls if assistant_message.tool_calls else []
 
     if not tool_calls:
         # No more tool calls needed
         print("\nFinal Response:")
-        print(message.content)
+        print(assistant_message.content)
         break
+
+    assistant_message_dict = {
+        "role": "assistant",
+        "content": assistant_message.content,
+        "tool_calls": [
+            {
+                "id": tc.id,
+                "type": tc.type,
+                "function": {
+                    "name": tc.function.name,
+                    "arguments": tc.function.arguments
+                }
+            } for tc in tool_calls
+        ]
+    }
+    message.append(assistant_message_dict)
 
     # Process each tool call
     for tool_call in tool_calls:
@@ -272,12 +309,12 @@ while True:
             result_content = "Unknown function called"
 
         # Append tool response to messages
-        messages.append({
+        message.append({
             "role": "assistant",
             "content": None,
             "tool_calls": [tool_call]
         })
-        messages.append({
+        message.append({
             "role": "tool",
             "tool_call_id": tool_call.id,
             "name": function_name,
@@ -287,7 +324,7 @@ while True:
     # Get next completion
     completion = model.chat.completions.create(
         model="deepseek/deepseek-chat-v3-0324:free",
-        messages=messages,
+        messages=message,
         tools=tools,
         tool_choice="auto",
     )
